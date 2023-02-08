@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 
+using DG.Tweening;
+
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -17,7 +19,17 @@ public class PlayerController : MonoBehaviour
 	[SerializeField]
 	LayerMask Obstacle;
 
+	[SerializeField]
+	GameObject PlayerVisual;
+
 	bool isAlive = true;
+
+	Animator animator;
+
+	private void Start()
+	{
+		animator = GetComponent<Animator>();
+	}
 
 	// Update is called once per frame
 	void Update()
@@ -36,6 +48,8 @@ public class PlayerController : MonoBehaviour
 			if (!Physics.Raycast(r, out RaycastHit hit, 1f, Obstacle))
 			{
 				GameManager.GoUp();
+				animator.SetTrigger("isJump");
+				PlayerVisual.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
 			}
 		}
 
@@ -48,6 +62,8 @@ public class PlayerController : MonoBehaviour
 			if (!Physics.Raycast(r, out RaycastHit hit, 1f, Obstacle))
 			{
 				CurrentXPos--;
+				animator.SetTrigger("isJump");
+				PlayerVisual.transform.rotation = Quaternion.Euler(0f, -90f, 0f);
 			}
 		}
 
@@ -59,6 +75,8 @@ public class PlayerController : MonoBehaviour
 			if (!Physics.Raycast(r, out RaycastHit hit, 1f, Obstacle))
 			{
 				CurrentXPos++;
+				animator.SetTrigger("isJump");
+				PlayerVisual.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
 			}
 		}
 
@@ -72,7 +90,7 @@ public class PlayerController : MonoBehaviour
 			CurrentXPos = -MaxXPos;
 		}
 
-		transform.position = new Vector3(CurrentXPos, 0f, 0f);
+		transform.DOMove(new Vector3(CurrentXPos, 0f, 0f), 0.2f).SetDelay(0.1f);
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -81,11 +99,11 @@ public class PlayerController : MonoBehaviour
 		{
 			isAlive = false;
 
+			//Active la physique et ajouter une force immédiate
 			Rigidbody rb = GetComponent<Rigidbody>();
 			rb.isKinematic = false;
-			rb.AddForce(Vector3.up * 10f + Random.Range(-10f, 10f) * Vector3.left, ForceMode.Impulse);
+			rb.AddForce(Vector3.up * 10f + Random.Range(-2f, 2f) * Vector3.left, ForceMode.Impulse);
 			rb.AddTorque(new Vector3(20f, 40f, 30f));
-
 
 			GameManager.Die();
 			print("Player is dead");
