@@ -18,15 +18,15 @@ public class Row : MonoBehaviour
 	int MaxX = 7;
 
 	public float baseZPosition = -1000;
+	List<int> randomPos = new List<int>();
 
 	private void Start()
 	{
-		List<int> randPosition = PickRandomNumbers(NumObstacles, MaxX);
-		print(randPosition);
-		for (int i = 0; i < randPosition.Count; i++)
+		PickRandomNumbers(NumObstacles, MaxX);
+		for (int i = 0; i < randomPos.Count; i++)
 		{
 			GameObject go = Instantiate(Obstacles[Random.Range(0, Obstacles.Count)], transform);
-			go.transform.localPosition = new Vector3(randPosition[i], 0, 0);
+			go.transform.localPosition = new Vector3(randomPos[i], 0, 0);
 		}
 	}
 
@@ -42,27 +42,25 @@ public class Row : MonoBehaviour
 		transform.DOMoveZ(baseZPosition, speed);
 	}
 
-	List<int> PickRandomNumbers(int numValues, int range)
+	void PickRandomNumbers(int numValues, int range)
 	{
-		List<int> result = new List<int>();
-
 		for (int i = 0; i < numValues; i++)
 		{
-			result.Add(PickRandomNumber(result, range));
+			PickRandomNumber(range);
 		}
-
-		return result;
 	}
 
-	int PickRandomNumber(List<int> tab, int range)
+	void PickRandomNumber(int range)
 	{
 		int rand = Random.Range(-range, range + 1);
 
-		if (tab.Contains(rand))
+		if (randomPos.Contains(rand))
 		{
-			PickRandomNumber(tab, range);
-		}
-
-		return rand;
+			PickRandomNumber(range);
+        }
+        else
+        {
+			randomPos.Add(rand);
+        }
 	}
 }

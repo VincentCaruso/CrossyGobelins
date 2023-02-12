@@ -25,10 +25,16 @@ public class PlayerController : MonoBehaviour
 	bool isAlive = true;
 
 	Animator animator;
+	AudioSource src;
+
+	public GameObject PS;
+	public AudioClip JumpSound;
+	public AudioClip CrashSound;
 
 	private void Start()
 	{
 		animator = GetComponent<Animator>();
+		src = GetComponent<AudioSource>();
 	}
 
 	// Update is called once per frame
@@ -50,6 +56,7 @@ public class PlayerController : MonoBehaviour
 				GameManager.GoUp();
 				animator.SetTrigger("isJump");
 				PlayerVisual.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+				PlaySound();
 			}
 		}
 
@@ -64,6 +71,7 @@ public class PlayerController : MonoBehaviour
 				CurrentXPos--;
 				animator.SetTrigger("isJump");
 				PlayerVisual.transform.rotation = Quaternion.Euler(0f, -90f, 0f);
+				PlaySound();
 			}
 		}
 
@@ -77,6 +85,7 @@ public class PlayerController : MonoBehaviour
 				CurrentXPos++;
 				animator.SetTrigger("isJump");
 				PlayerVisual.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
+				PlaySound();
 			}
 		}
 
@@ -99,7 +108,7 @@ public class PlayerController : MonoBehaviour
 		{
 			isAlive = false;
 
-			//Active la physique et ajouter une force immédiate
+			//Active la physique et ajouter une force imm?diate
 			Rigidbody rb = GetComponent<Rigidbody>();
 			rb.isKinematic = false;
 			rb.AddForce(Vector3.up * 10f + Random.Range(-2f, 2f) * Vector3.left, ForceMode.Impulse);
@@ -107,7 +116,18 @@ public class PlayerController : MonoBehaviour
 
 			GameManager.Die();
 			print("Player is dead");
+
+			//cr?e le moteur de particules et le met ? la postion du joueur
+			GameObject go = Instantiate(PS);
+			go.transform.position = transform.position;
+			src.PlayOneShot(CrashSound);
+			src.pitch = 1f;
 		}
 	}
 
+	void PlaySound()
+    {
+		src.PlayOneShot(JumpSound);
+		src.pitch = Random.Range(0.8f, 1.2f);
+    }
 }
